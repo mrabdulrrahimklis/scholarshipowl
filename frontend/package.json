@@ -1,0 +1,45 @@
+{
+  "name": "admissions-readiness-ui",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "test:unit": "vitest run",
+    "test:unit:watch": "vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "lint": "eslint . && prettier --check \"{components,composables,pages,stores,layouts,types,lib}/**/*.{ts,vue}\"",
+    "format": "prettier --write \"{components,composables,pages,stores,layouts,types,lib}/**/*.{ts,vue}\" app.vue"
+  },
+  "dependencies": {
+    "@headlessui/vue": "^1.7.23",
+    "@pinia/nuxt": "^0.5.5",
+    "@vueuse/core": "^11.3.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-vue-next": "^0.460.0",
+    "pinia": "^2.2.6",
+    "tailwind-merge": "^2.5.5",
+    "tailwindcss-animate": "^1.0.7",
+    "vue": "^3.5.13",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.17.0",
+    "@nuxtjs/tailwindcss": "^6.12.2",
+    "@playwright/test": "^1.49.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.4.11",
+    "eslint": "^10.8.1",
+    "happy-dom": "^20.11.2",
+    "nuxt": "^3.14.1592",
+    "prettier": "^3.4.2",
+    "prettier-plugin-tailwindcss": "^0.6.9",
+    "typescript": "5.7.2",
+    "vitest": "^4.1.10"
+  }
+}

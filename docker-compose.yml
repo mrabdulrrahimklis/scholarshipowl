@@ -1,0 +1,34 @@
+services:
+  api:
+    build: ./backend
+    container_name: admissions_api
+    restart: unless-stopped
+    environment:
+      # SQLite file lives on a persistent volume mounted at /data.
+      DATABASE_URL: file:/data/dev.db
+      SQLITE_DB_PATH: /data/dev.db
+      PORT: "4000"
+      # Allow the browser origin(s). 3001 covers the WEB_PORT=3001 fallback.
+      CORS_ORIGIN: http://localhost:3000,http://localhost:3001
+    volumes:
+      - admissions_sqlite:/data
+    ports:
+      - "4000:4000"
+
+  web:
+    build: ./frontend
+    container_name: admissions_web
+    restart: unless-stopped
+    environment:
+      # SSR (inside this container) talks to the API over the internal network
+      NUXT_API_BASE_SERVER: http://api:4000/graphql
+      # The browser talks to the API via the host-published port
+      NUXT_PUBLIC_API_BASE: http://localhost:4000/graphql
+    ports:
+      # Override with WEB_PORT if host 3000 is busy, e.g. `WEB_PORT=3001 docker compose up`
+      - "${WEB_PORT:-3000}:3000"
+    depends_on:
+      - api
+
+volumes:
+  admissions_sqlite:

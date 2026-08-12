@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Env
+.env
+.env.local
+!.env.example
+
+# Build output
+dist/
+.output/
+.nuxt/
+.nitro/
+.cache/
+
+# Bun / logs
+*.log
+bun.lockb
+
+# Playwright
+test-results/
+playwright-report/
+frontend/playwright/.cache/
+
+# OS
+.DS_Store

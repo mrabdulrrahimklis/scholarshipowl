@@ -1,0 +1,7 @@
+{
+  // Nuxt generates ./.nuxt/tsconfig.json with the ~/* and @/* path aliases and
+  // the auto-import type declarations (composables, components, etc.). Extending
+  // it is what makes the IDE resolve `~/types/api` and auto-imported helpers
+  // like `useFormat`. Run `nuxt prepare` (or `bun install`) if .nuxt is missing.
+  "extends": "./.nuxt/tsconfig.json"
+}

@@ -1,0 +1,94 @@
+// Prisma schema — SQLite datasource.
+//
+// Note: SQLite does not support native enums, so enum-like fields
+// (degreeType, requirement type, evidenceType, checklist status) are stored as
+// String and validated at the API edge with Zod. Dates are stored as String in
+// `YYYY-MM-DD` form so the pure domain logic (dueDate/readiness) is unchanged.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Program {
+  id                  String        @id @default(uuid())
+  name                String
+  degreeType          String // bachelors | masters | phd | certificate
+  institution         String
+  description         String        @default("")
+  applicationDeadline String // YYYY-MM-DD
+  createdAt           DateTime      @default(now())
+  requirements        Requirement[]
+
+  @@map("programs")
+}
+
+model Requirement {
+  id            String          @id @default(uuid())
+  programId     String
+  program       Program         @relation(fields: [programId], references: [id], onDelete: Cascade)
+  type          String // transcript | test_score | essay | recommendation | application | financial
+  title         String
+  description   String          @default("")
+  dueOffsetDays Int             @default(0)
+  required      Boolean         @default(true)
+  evidenceType  String          @default("file") // file | text | link | score
+  checklistItems ChecklistItem[]
+
+  @@map("requirements")
+}
+
+model StudentProfile {
+  id             String          @id @default(uuid())
+  name           String
+  email          String
+  educationLevel String
+  gpa            Float?
+  testScores     String?
+  targetTerm     String
+  createdAt      DateTime        @default(now())
+  checklistItems ChecklistItem[]
+  timelineEvents TimelineEvent[]
+
+  @@map("student_profiles")
+}
+
+// Persisted per the suggested data model. Kept in sync with the checklist on
+// generation and on every status/due-date change (see services/checklist.ts).
+model TimelineEvent {
+  id                   String         @id @default(uuid())
+  profileId            String
+  profile              StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  programId            String
+  relatedRequirementId String
+  title                String
+  date                 String // YYYY-MM-DD (the requirement's due date)
+  status               String // not_started | in_progress | complete
+  required             Boolean        @default(true)
+
+  // One event per requirement per profile.
+  @@unique([profileId, relatedRequirementId])
+  @@index([profileId, programId])
+  @@map("timeline_events")
+}
+
+model ChecklistItem {
+  id            String         @id @default(uuid())
+  profileId     String
+  profile       StudentProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  requirementId String
+  requirement   Requirement    @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  status         String         @default("not_started") // not_started | in_progress | complete
+  dueDate        String // YYYY-MM-DD
+  notes          String         @default("") // student's own notes
+  counselorNotes String         @default("") // counselor notes per requirement
+  updatedAt      DateTime       @updatedAt
+
+  // Keeps checklist generation/update idempotent per profile+requirement.
+  @@unique([profileId, requirementId])
+  @@map("checklist_items")
+}
